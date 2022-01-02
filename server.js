@@ -6,7 +6,7 @@ const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const session = require('express-session');
 const passport = require('passport');
 const ObjectID = require('mongodb').ObjectID;
-const LocalStategy = require('passport-local');
+const LocalStrategy = require('passport-local');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -29,14 +29,26 @@ app.use(passport.session());
 myDB(async (client) => {
   const myDatabase = await client.db('advancedNodeDB').collection('users');
 
-  app.route('/').get((req, res) => {
-    res.render(
-      process.cwd() + '/views/pug/index.pug', {
-        title: 'Connected to database',
-        message: 'Please login'
-      }
-    );
-  });
+  app.route('/')
+    .get((req, res) => {
+      res.render(
+        process.cwd() + '/views/pug/index', {
+          title: 'Connected to database',
+          message: 'Please login',
+          showLogin: true
+        }
+      );
+    })
+
+  app.route('/login')
+    .post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+      res.redirect('/profile')
+    })
+
+  app.route('/profile')
+    .get((req, res) => {
+      res.render(process.cwd() + '/views/pug/profile');
+    })
 
   passport.serializeUser((user, done) => {
     done(null, user._id);
