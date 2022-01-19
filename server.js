@@ -38,26 +38,26 @@ myDB(async (client) => {
           showLogin: true
         }
       );
-    })
+    });
 
   app.route('/login')
     .post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
       res.redirect('/profile')
-    })
+    });
 
   app.route('/profile')
     .get(ensureAuthenticated, (req, res) => {
       res.render(process.cwd() + '/views/pug/profile', {
-        username : req.user.username
+        username: req.user.username
       });
-    })
+    });
 
   passport.serializeUser((user, done) => {
     done(null, user._id);
   });
 
   passport.deserializeUser((id, done) => {
-    myDatabase.findOne({ _id: new ObjectID(id) }, (error, doc) => {
+    myDatabase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
       done(null, doc);
     });
   });
@@ -76,7 +76,7 @@ myDB(async (client) => {
 }).catch((e) => {
   app.route('/').get((req, res) => {
     res.render(
-      process.cwd() + '/views/pug/index.pug', {
+      process.cwd() + '/views/pug/index', {
         title: e,
         message: 'Unable to login'
       }
