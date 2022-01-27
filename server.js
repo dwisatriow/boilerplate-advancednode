@@ -8,7 +8,6 @@ const passport = require('passport');
 
 const routes = require('./routes');
 const auth = require('./auth.js');
-const { route } = require('express/lib/application');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -31,7 +30,7 @@ app.use(passport.session());
 myDB(async (client) => {
   const myDatabase = await client.db('advancedNodeDB').collection('users');
 
-  route(app, myDatabase);
+  routes(app, myDatabase);
   auth(app, myDatabase);
 }).catch((e) => {
   app.route('/').get((req, res) => {
@@ -43,13 +42,6 @@ myDB(async (client) => {
     );
   })
 });
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/');
-}
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
