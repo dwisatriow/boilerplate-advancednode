@@ -44,8 +44,9 @@ module.exports = function (app, myDatabase) {
       },
       function (accessToken, refreshToken, profile, done) {
         console.log(profile);
-        myDatabase.findOneAndUpdate(
+        myDatabase.findAndModify(
           { id: profile.id },
+          {},
           {
             $setOnInsert: {
               id: profile.id,
