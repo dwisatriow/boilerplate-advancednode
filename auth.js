@@ -1,7 +1,6 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const GithubStrategy = require("passport-github").Strategy;
-// const GithubStrategy = require("passport-github2").Strategy;
+const GithubStrategy = require("passport-github2").Strategy;
 const ObjectID = require("mongodb").ObjectID;
 const bcrypt = require("bcrypt");
 
@@ -44,28 +43,35 @@ module.exports = function (app, myDatabase) {
           "https://hidden-spire-68320.herokuapp.com/auth/github/callback",
       },
       function (accessToken, refreshToken, profile, done) {
-        myDatabase.findOne(
-          { username: profile.username },
-          function (err, user) {
+        console.log(profile);
+        myDatabase.findOneAndUpdate(
+          { id: profile.id },
+          {
+            $setOnInsert: {
+              id: profile.id,
+              username: profile.username,
+              name: profile.displayName || "John Doe",
+              photo: profile.photos[0].value || "",
+              email: Array.isArray(profile.emails)
+                ? profile.emails[0].value
+                : "No public email",
+              created_on: new Date(),
+              provider: profile.provider || "",
+            },
+            $set: {
+              last_login: new Date(),
+            },
+            $inc: {
+              login_count: 1,
+            },
+          },
+          { upsert: true, new: true },
+          (err, doc) => {
             console.log(
               "Github user " + profile.username + " attempted to login."
             );
-            if (err) {
-              return done(err);
-            } else if (user) {
-              return done(null, user);
-            } else {
-              myDatabase.insertOne(
-                { username: profile.username },
-                (err, doc) => {
-                  if (err) {
-                    return done(err);
-                  } else {
-                    return done(null, doc.ops[0]);
-                  }
-                }
-              );
-            }
+            console.log(doc);
+            return done(null, doc.value);
           }
         );
       }
