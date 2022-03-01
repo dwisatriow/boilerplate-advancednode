@@ -1,6 +1,6 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const GithubStrategy = require("passport-github").Strategy;
+const GithubStrategy = require("passport-github2").Strategy;
 const ObjectID = require("mongodb").ObjectID;
 const bcrypt = require("bcrypt");
 
@@ -70,7 +70,6 @@ module.exports = function (app, myDatabase) {
             console.log(
               "Github user " + profile.username + " attempted to login."
             );
-            console.log(doc);
             return done(null, doc.value);
           }
         );
