@@ -33,7 +33,6 @@ module.exports = function (app, myDatabase) {
     })
   );
 
-  // Incomplete code below
   passport.use(
     new GithubStrategy(
       {
