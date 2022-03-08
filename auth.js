@@ -11,6 +11,7 @@ module.exports = function (app, myDatabase) {
 
   passport.deserializeUser((id, done) => {
     myDatabase.findOne({ _id: new ObjectID(id) }, (err, doc) => {
+      if (err) return console.error(err);
       done(null, doc);
     });
   });
@@ -41,7 +42,7 @@ module.exports = function (app, myDatabase) {
         callbackURL:
           "https://hidden-spire-68320.herokuapp.com/auth/github/callback",
       },
-      function (accessToken, refreshToken, profile, done) {
+      function (accessToken, refreshToken, profile, cb) {
         console.log(profile);
         myDatabase.findAndModify(
           { id: profile.id },
@@ -70,7 +71,7 @@ module.exports = function (app, myDatabase) {
             console.log(
               "Github user " + profile.username + " attempted to login."
             );
-            return done(null, doc.value);
+            return cb(null, doc.value);
           }
         );
       }
