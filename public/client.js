@@ -1,8 +1,12 @@
 // eslint-disable-next-line no-undef
 $(document).ready(function () {
   // global io
-  // eslint-disable-next-line
+  // eslint-disable-next-line no-undef
   var socket = io();
+
+  socket.on("user count", function (data) {
+    console.log(data);
+  });
 
   // Form submittion with new message in field with id 'm'
   // eslint-disable-next-line no-undef

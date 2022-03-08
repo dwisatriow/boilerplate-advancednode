@@ -38,9 +38,14 @@ myDB(async (client) => {
   routes(app, myDatabase);
   auth(app, myDatabase);
 
+  let currentUsers = 0;
+
   // eslint-disable-next-line no-unused-vars
   io.on("connection", (socket) => {
+    currentUsers++;
     console.log("A user has connected");
+
+    io.emit("user count", currentUsers);
   });
 }).catch((e) => {
   app.route("/").get((req, res) => {
