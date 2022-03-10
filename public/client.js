@@ -12,7 +12,7 @@ $(document).ready(function () {
   });
 
   socket.on("chat message", (data) => {
-    $("messages").append($("<li>").text(`${data.name}: ${data.message}`)); // eslint-disable-line
+    $("#messages").append($("<li>").text(`${data.name}: ${data.message}`)); // eslint-disable-line
   });
 
   // Form submittion with new message in field with id 'm'
