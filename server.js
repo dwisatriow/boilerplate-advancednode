@@ -40,17 +40,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-function onAuthorizeSuccess(data, accept) {
-  console.log("Successful connection to socket.io");
-  accept(null, true);
-}
-
-function onAuthorizeFail(data, message, error, accept) {
-  if (error) throw new Error(message);
-  console.log("failed connection to socket.io:", message);
-  accept(null, false);
-}
-
 io.use(
   passportSocketIo.authorize({
     cookieParser: cookieParser,
@@ -73,13 +62,21 @@ myDB(async (client) => {
   // eslint-disable-next-line no-unused-vars
   io.on("connection", (socket) => {
     currentUsers++;
-    io.emit("user count", currentUsers);
+    io.emit("user", {
+      name: socket.request.user.name,
+      currentUsers,
+      connected: true,
+    });
     console.log("user " + socket.request.user.name + " connected");
 
     socket.on("disconnect", () => {
       currentUsers--;
+      io.emit("user", {
+        name: socket.request.user.name,
+        currentUsers,
+        connected: false,
+      });
       console.log("A user has disconnected");
-      io.emit("user count", currentUsers);
     });
   });
 }).catch((e) => {
@@ -90,6 +87,17 @@ myDB(async (client) => {
     });
   });
 });
+
+function onAuthorizeSuccess(data, accept) {
+  console.log("Successful connection to socket.io");
+  accept(null, true);
+}
+
+function onAuthorizeFail(data, message, error, accept) {
+  if (error) throw new Error(message);
+  console.log("failed connection to socket.io:", message);
+  accept(null, false);
+}
 
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
