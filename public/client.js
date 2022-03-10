@@ -11,10 +11,15 @@ $(document).ready(function () {
     $("messages").append($("<li>").html("<b>" + message + "</b>")); // eslint-disable-line
   });
 
+  socket.on("chat message", (data) => {
+    $("messages").append($("<li>").text(`${data.name}: ${data.message}`)); // eslint-disable-line
+  });
+
   // Form submittion with new message in field with id 'm'
   // eslint-disable-next-line no-undef
   $("form").submit(function () {
     var messageToSend = $("#m").val(); // eslint-disable-line
+    socket.emit("chat message", messageToSend);
 
     $("#m").val(""); // eslint-disable-line
     return false; // prevent form submit from refreshing page
